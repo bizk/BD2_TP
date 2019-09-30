@@ -1,0 +1,136 @@
+// SET
+If the value on a key already exists it changes the value for the new one
+if not, it creates a new entry on that key.
+    set serie:1000 "black mirror"
+    get serie:1000 -> "black mirror"
+
+-EX [s] -> the value expires in thos secconds
+-PX [ms] -> the value expires in those miliseocnds
+-NX -> set is succesful if the key didnt exist
+-XX -> set is succesful if the kew existed before
+    set serie:1001 “The OA” xx -> nill
+    get serie:1001 “The OA” nx -> OK
+
+//OPERATORS
+incr -> converts string to int, adds 1 and sets it as the new value
+incrby -> inc with a value
+decr -> incr but decreses
+decrby 
+
+code example: 
+    set likes 10 -> OK
+    incr likes -> 11
+    incrby likes 10 -> 21
+
+//MGET y MSET
+it let uas make masive set or get operations
+    mset serie:1001 "Stranger things" serie:1002 "breakking bad" -> OK
+    mget serie:1001 serie:1002
+
+//KEY OPERATORS
+exists -> returns 0 or 1 if a key exists
+    exists genre -> 0
+    exists serie -> 1
+
+type -> as exist, but it returns the type of value from a KEY
+
+
+//LISTS
+redis has 2 indexed lists, so LPUSH or RPUSH should take the same amount of
+time. But accesing an element by its index is slower than an array
+We should not initialize a list without values, since is the bd responsability
+to initialize its elements and delete them if they are empty.
+lpush rpush -> push an element
+lrange [start index] [last index] -> show all elements
+lpop y rpop -> remove an element
+ltrim [start index] [last index included] -> it stores only the elements betwen those indexes   
+del -> deletes the list
+
+code example
+    lpush numeros 2 3
+    lpush numeros 1
+    rpush numeros 4
+    lrange numeros 0 -1 -> "1 2 3 4 "
+
+//BOCKED LIST (productor consumidor)
+    brpop tasks 5 -> it will wait for 5 segs until recovering everything
+                    if the list is still empty it returns 
+
+//HASHES
+Son objetos del tipo clave valorr. y soon buenos para representar objetos
+    -HSET (hmset -> muchos) -> agrega una clave valor
+    -HGET (hmget -> multipls) -> obtiene una clave valor
+
+    ej:
+    hmset serie:1000 title "black mirror" season 1 episode 1 likes 22
+    hgetall serie:1000 -> nos devuelve todos los HASHES
+    hincrby serie:1000 likes 5 -> likes = 27
+
+//sets
+los sets son colecciones de strings sin repeticion ni orden (conjuntos)
+    -SADD agregar elementos a un set -> devuelve la cant de elemento agregado
+    -SCARD cantidad de elementos de un set
+    -SDIFF permite ver la dif entre distinso set
+    -SDIFFSTORE guarda la diferencia en un nuevo set
+    -SISMEMBER indica si un elemento pertenece a un set
+    -SMEMBERS retorna todos los elementos de un ned
+    -SMOVE mueve un elemento de un set origen a un set destino
+    -SPOP/SRANDMEMBER devuelve uno o varios elem random de un set, pop los elimina
+    -SREM elimina el elemento especificado del set
+    -SSCAN obtiene un cursor para recorrer los elem de un set
+    -SUNION/SUNIONSTORE realizar union entre sets.
+
+    ej: 
+    SADD article:1000:tags ciencia it
+    SADD article:1010:tags nosql it
+    SMEMBERS article:1000:tags -> "it" "ciencia"
+    SISMEMBER article:1000:tags nosql -> 0
+    SINTERSTORE commontags article:1000:tags article:1010:tags
+    SMEMBERS commontags -> "it" (solo nos devuelve este pq es el q tenian en comun)
+
+//SORTED SETS
+Es un set pero con ordenamiento en el cual cada elemento tiene
+un valor asociado (punto flotantte)  llamado score
+el elemento que va primero es el de menor score o el string lexigocraficamente
+mas pequeno, y el score puede ser modificado en cualquier momento
+    -zadd hackers 1940 "alan kay"
+    -zadd hackers 1957 "Anita borg"
+    -zrange hackers 0 -1 (orden creciente) -> alan k , anita b
+    -zrevrange hackers 0 -1 (orden decreciente) -> anita b, alan k
+    -zrange hackers 0 -1 withscores -> alan k, 1949 , anita b, 1957
+    
+    ZRANGEBYSCORE obtiene un rango de elementos acotando por su score
+    ZREMRANGEBYSCORE elimina y devuelve la cantidad de elementos cuyo score pertenece al rango
+    ZRANK devuelve la posicion del elemento en el ranking de scores
+    ZRANKBYLEX
+    ZREVRANGEBYLEX
+    ZREMRANGEBYLEX
+    ZELEXCOUNT
+    
+ //BITMAP
+ Son una forma de interpretar y manejar los strings, ahorrando espacio de 
+ almacenamiento, podemos hacer operaciones sobre un unico bits y sobre grupos de bits
+    SETBIT asignan el bit en una posicion aprticular para una clave
+    GETBIT obtiene
+    BITOPS operaciones AND OR XOR Y NOT entre strings
+    BITCOUNT nos dice cuantos bits estan activados en un string
+    BITPOS encunetra el primer bit con un valor especifico 0 o 1
+
+    ej:
+    SETBIT key 0 1
+    bitcount key -> 1
+
+//HYPERLOGLOGS
+Estrutura de datos probabilistica usada para contar eventos unicos requiriendo
+un tamano fijo y pequeno de memoria para lograrlo (12KB como mucho)
+HLL utiliza algoritmos que disminuyen los requerimientos de memoria a cambio de bajas
+en la precision, por lo cual el valor obtenido tiene un error estandard < 1%
+De lo contrario se deberia recorrer cada elemento para tener una cuenta precisa
+Su comportamiento es similar a un set, los elementos no se agregan realmente
+la estructura posee el estado pero no los elementos.
+    PFADD ->agrega elementos
+    PFCOUNT cuenta la cantidad de elementos
+
+    ej: 
+     pfadd busquedas "topper" "zapatillas" "remera roja" "topper"
+     pfcount busquedas -> 3

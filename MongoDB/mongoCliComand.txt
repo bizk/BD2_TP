@@ -1,0 +1,120 @@
+
+//Switches to another db
+use testdb
+
+//We can select al the collections it has
+db.getCollectionNames()
+
+//We create a new document
+db.[collection_name].insert([arguments])
+
+//Find () returns all the docs a collection has
+db.[collection_name].find()
+
+/*
+FIND expresions
+find(value) or find(value1, value, ... ) let us find many values, ',' is used as AND operator
+
+$lt, $lte, $gt, $gte y $ne son usados por las operaciones menor
+que, menor o igual que, mayor que, mayor o igual que y no igual
+    db.players.find({preferred_foot:'left', weight:{$gt:170}})
+
+$exists Chequea que exista o no de un campo
+    db.players.find({height:{$exist:false}}) -> 
+En este caso devuelve el documento que no tiene el campo height
+
+$or -> db.players.find({preferred_foot:'right', $or:[{hobbies:'Playing
+    football'},{hobbies:'Video games'}, {weight:{$lt:150}}]}) -> returns 
+the players with preferred_foot = right and whos hobbies are playing video games
+playing footbal or whos weight is smaller than 150.
+
+$regex 
+-> db.players.find({name: {$regex: "^S"}}) -> players that start with S
+-> db.players.find({name: {$regex: "o$"}}) -> players where its name ends with operaciones
+
+buscar algo mixto
+
+*/
+
+Second param
+    db.players.find(null, {name:1}) -> will return everything and only the name and id
+    db.players.find(null, {name:1,_id:0}) -> Will return only names.
+
+.sort()
+It let us sort accotding to the values we use as an input
+1 for increasing order and -1 for decreasing.
+    db.players.find().sort({height:-1})
+    db.players.find().sort({name:1, height:-1})
+
+.limit([number])
+It limits how many things we see 
+
+.skip([number])
+it skips from the first value, what it show us
+    db.players.find().sort({weight:-1}).limit(2).skip(1) -> we get the second and third players whose weight is the heaiest;
+
+//REMOVE
+    db.[collection_name].remove() -> Remove all docs from collection
+
+//UPDATE
+It looks for the documents that have the name variables 
+and change the whole doc with the new data
+    db.[collection_name].update({name: "random name"}, {weight:180})
+We updated the weight but lost the rest of the doc.
+$set -> let us modify as we want, it adds or modify values but doesnt remove the doc.
+    db.[collection_name].update({name: "random name"},{$set: {weight:180}})
+
+$inc -> increments or decrements a value
+    db.[collection_name].update({name:"random name"}, {$inc:{height:-5}})
+ we decrease the height by 5
+
+$push -> let us add an object to a collection
+    db.[collection_name].update({name:"random name"}, {$push:{hobbies:"swimming"}})
+
+// UPSERTS 
+It checks if there is a doc with the name "random name" exists, if not, it creates it, otherwise it update the variable.
+    db.[collection_name].update({name:"random name"}, {$inc:{value:1}}, true)
+
+// UPDATE ALL OBJECTS IN COLLECTION
+it uses a fourth param, so we use {} to select everything, $set to update
+false beause we dont want to make an upsert, and then true.
+    db.players.update({}, {$set:{active: true}}, false, true)
+
+// COUNT
+we use count to determinate how many documents match certain argument.
+    db.players.count({hobbies:'Swimming'})
+    db.players.find({hobbies:'Swimming'}).count()
+
+//EMBEDED documents
+We add an embedded document when we use [collection_name]:{}
+    db.players.update({name: 'Cristiano Ronaldo'},{$set:{team:{
+        team_long_name: 'Juventus', team_short_name: 'JUV'}}})
+And we can look for it using [collection_name].[argument]
+    db.players.find({'team.team_short_name': 'JUV'})
+
+//INDEXES
+.ensureIndex() -> let us create an index
+    db.players.ensureIndex({name:1})
+.dropIndex() ->let us delete an index
+    db.players.dropIndex({name:1})
+unique:true -> let us create a unique index
+    db.players.ensureIndex({name:1},{unique:true})
+complex INDEXES
+    db.players.ensureIndex({name:1, weight:1})
+.explain()
+let us know with document has an index
+    db.players.find({name: 'Lionel Messi'}).explain()
+
+// code example
+db.players.insert({
+    name:'Aaron Appindanoye',
+    height: 182,
+    wight: 186})
+    
+db.players.find()
+db.players.insert({
+    name:"Edinson Cavani",
+     height: 192,
+     weight: 187,
+     dob: new Date(1979,2,14,0,0),
+     hobbies:["playing soccer","basketball"]})
