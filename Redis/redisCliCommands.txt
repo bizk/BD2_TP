@@ -40,11 +40,11 @@ redis has 2 indexed lists, so LPUSH or RPUSH should take the same amount of
 time. But accesing an element by its index is slower than an array
 We should not initialize a list without values, since is the bd responsability
 to initialize its elements and delete them if they are empty.
-lpush rpush -> push an element
-lrange [start index] [last index] -> show all elements
-lpop y rpop -> remove an element
-ltrim [start index] [last index included] -> it stores only the elements betwen those indexes   
-del -> deletes the list
+    lpush rpush -> push an element
+    lrange [start index] [last index] -> show all elements
+    lpop y rpop -> remove an element
+    ltrim [start index] [last index included] -> it stores only the elements betwen those indexes   
+    del -> deletes the list
 
 code example
     lpush numeros 2 3

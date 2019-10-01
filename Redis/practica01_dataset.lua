@@ -1,0 +1,18 @@
+redis.call("ZADD","TRACK",18144759,"01");
+redis.call("HSET","TRACK:01","name","Bohemian Rhapsody");
+redis.call("ZADD","TRACK",8248862,"02");
+redis.call("HSET","TRACK:02","name","Under Pressure");
+redis.call("ZADD","TRACK",7198189,"03");
+redis.call("HSET","TRACK:03","name","We Will rock you");
+redis.call("ZADD","TRACK",11035989,"04");
+redis.call("HSET","TRACK:04","name","Another One Bites the dust");
+redis.call("ZADD","TRACK",9119911,"05");
+redis.call("HSET","TRACK:05","name","Dont stop me now");
+redis.call("ZADD","TRACK",4535541,"06");
+redis.call("HSET","TRACK:06","name","We are the champions");
+redis.call("ZADD","TRACK",4205776,"07");
+redis.call("HSET","TRACK:07","name","Crazy little thing called love");
+redis.call("ZADD","TRACK",9096829,"08");
+redis.call("HSET","TRACK:08","name","Somebody to love");
+redis.call("ZADD","TRACK",6981015,"09");
+redis.call("HSET","TRACK:09","name","Killer queen");
