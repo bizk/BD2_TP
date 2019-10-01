@@ -16,4 +16,13 @@ for i, cancion in ipairs(canciones) do
     table.insert(test,{c, score});
 end
 
-return test;
+local c;
+for i, cancion in ipairs(canciones) do
+    local valor = redis.call("HGET","TRACK:"..cancion, "name");
+    if (valor == "We are the champions") then
+    --  return redis.call("ZRANK","TRACK"..cancion);
+    end
+end
+
+redis.call("ZREMRANGEBYSCORE","TRACK",0,5000000);
+return redis.call("zrevrange","TRACK", 0,-1,"WITHSCORES");
